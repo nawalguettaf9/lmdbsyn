@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  web:
+    container_name: symfony_web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"  # Choisir le port de votre choix
+    volumes:
+      - ./:/var/www/html
+      - ./apache.conf:/etc/apache2/sites-available/000-default.conf  # Monter le fichier de configuration Apache
+    depends_on:
+      - mongodb
+    networks:
+      - symfony_net
+
+  mongodb:
+    container_name: symfony_mongodb
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: maisonbonheur
+    ports:
+      - "27017:27017"  # Port MongoDB
+    networks:
+      - symfony_net
+    volumes:
+      - mongodb_data:/data/db  # Montez un volume pour stocker les données MongoDB
+
+networks:
+  symfony_net:
+    driver: bridge
+
+volumes:
+  mongodb_data:  # Définissez un volume pour stocker les données MongoDB
